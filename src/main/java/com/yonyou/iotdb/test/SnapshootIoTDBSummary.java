@@ -77,7 +77,7 @@ public class SnapshootIoTDBSummary {
         session.open(false);
         session.setFetchSize(100);
 
-        try(log) {
+        try {
             // 日志开始
             log.writeHeader(ip, port, endTimestamp, saveDataIntegrity);
             // -----schema export-------
@@ -226,6 +226,7 @@ public class SnapshootIoTDBSummary {
             e.printStackTrace();
         } finally {
             session.close();
+            log.close();
         }
     }
 
@@ -235,7 +236,7 @@ public class SnapshootIoTDBSummary {
         List<String> columnTypes = set.getColumnTypes();
         SessionDataSet.DataIterator it = set.iterator();
         StringBuilder sb = new StringBuilder(topStr);
-        sb.append("\n");
+        sb.append(System.lineSeparator());
         while(it.next()) {
             for (int k = 0; k < columnNames.size(); k++) {
                 String cname = columnNames.get(k);
@@ -247,7 +248,6 @@ public class SnapshootIoTDBSummary {
             }
             if(columnNames.size() != 0) {
                 sb.deleteCharAt(sb.length() - 1);
-                sb.append("\n");
             }
         }
         return sb.toString();

@@ -30,11 +30,11 @@ public class TestCompareSnapshootLog implements AutoCloseable {
     }
 
     public void writeSgList(List<String> sgList) throws IOException {
-        this.writer.write("sgList----------");
+        this.writer.write("----------sgList");
         if(sgList != null) {
             sgList.forEach(sg-> {
                 try {
-                    this.writer.write(sg+LINE);
+                    this.writer.write(sg+",");
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -44,18 +44,18 @@ public class TestCompareSnapshootLog implements AutoCloseable {
     }
 
     public void writeStartSg(String sg) throws IOException {
-        this.writer.write("startSg----------");
+        this.writer.write("--------startSg");
         this.writer.write(sg);
         this.writer.write(LINE);
     }
 
     public void writeDeviceList(List<Pair<String, String>> devices) throws IOException {
-        this.writer.write("deviceList----------");
+        this.writer.write("------deviceList");
         if(devices != null) {
             devices.forEach(device->{
                 if(device != null) {
                     try {
-                        this.writer.write(device.left+LINE);
+                        this.writer.write(device.left+",");
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
@@ -66,7 +66,7 @@ public class TestCompareSnapshootLog implements AutoCloseable {
     }
 
     public void writeStartDevice(String device) throws IOException {
-        this.writer.write("startDevice----------");
+        this.writer.write("------startDevice");
         this.writer.write(device);
         this.writer.write(LINE);
     }
@@ -84,7 +84,8 @@ public class TestCompareSnapshootLog implements AutoCloseable {
                 }
             });
         }
-        this.writer.write("endMMap----------");
+        this.writer.write("------endMMap");
+        this.writer.write(LINE);
     }
 
     public void write(String str) throws IOException {
