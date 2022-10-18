@@ -15,23 +15,23 @@ public interface SummaryDataReader {
 
     List<String> readSgList();
 
-    List<Pair<String, String>> readDevcieList(String sg);
+    List<Pair<String, String>> readDevcieList(String sg) throws Exception;
 
-    SortedMap<String, String> readMMap(String device);
+    SortedMap<String, String> readMMap(String device) throws Exception;
 
-    String readCount(String device, long endTimestamp);
+    String readCount(String device, long endTimestamp) throws Exception;
 
-    String readMinMaxTime(String device, long endTimestamp);
+    String readMinMaxTime(String device, long endTimestamp) throws Exception;
 
-    String readCount(String device, long beginTime, long endTimestamp);
+    String readCount(String device, long beginTime, long endTimestamp) throws Exception;
 
-    String readMinMaxValue(String device, long beginTime, long endTimestamp);
+    String readMinMaxValue(String device, long beginTime, long endTimestamp) throws Exception;
 
-    String readLimitTop(String device, long beginTime, long endTimestamp, int count);
+    String readLimitTop(String device, long beginTime, long endTimestamp, int count) throws Exception;
 
-    String readLimitBottom(String device, long beginTime, long endTimestamp, int count);
+    String readLimitBottom(String device, long beginTime, long endTimestamp, int count) throws Exception;
 
-    String readTop(String device, long beginTime, long endTimestamp, int count);
+    String readTop(String device, long beginTime, long endTimestamp, int count) throws Exception;
 
-    String readBottom(String device, long beginTime, long endTimestamp, int count);
+    String readBottom(String device, long beginTime, long endTimestamp, int count) throws Exception;
 }

@@ -13,6 +13,12 @@ public class TestCompareSnapshootLog implements AutoCloseable {
     private File logFile;
     private FileWriter writer;
     private static String LINE = System.lineSeparator();
+    public static final String SGLIST_MARK = "----------sgList";
+    public static final String STARTSG_MARK = "--------startSg";
+    public static final String DEVICELIST_MARK = "------deviceList";
+    public static final String STARTDEVICE_MARK = "------startDevice";
+    public static final String ENDMMAP_MARK = "------endMMap";
+    public static final String ENDLINE_MARK = "------endLine";
 
     public TestCompareSnapshootLog(File logFile) throws IOException {
         this.logFile = logFile;
@@ -30,43 +36,39 @@ public class TestCompareSnapshootLog implements AutoCloseable {
     }
 
     public void writeSgList(List<String> sgList) throws IOException {
-        this.writer.write("----------sgList");
+        this.writer.write(SGLIST_MARK);
         if(sgList != null) {
-            sgList.forEach(sg-> {
-                try {
-                    this.writer.write(sg+",");
-                } catch (IOException e) {
-                    e.printStackTrace();
+            for (int i = 0; i < sgList.size(); i++) {
+                this.writer.write(sgList.get(i));
+                if(i != sgList.size() - 1) {
+                    this.writer.write(",");
                 }
-            });
+            }
         }
         this.writer.write(LINE);
     }
 
     public void writeStartSg(String sg) throws IOException {
-        this.writer.write("--------startSg");
+        this.writer.write(STARTSG_MARK);
         this.writer.write(sg);
         this.writer.write(LINE);
     }
 
     public void writeDeviceList(List<Pair<String, String>> devices) throws IOException {
-        this.writer.write("------deviceList");
+        this.writer.write(DEVICELIST_MARK);
         if(devices != null) {
-            devices.forEach(device->{
-                if(device != null) {
-                    try {
-                        this.writer.write(device.left+",");
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
+            for (int i = 0; i < devices.size(); i++) {
+                this.writer.write(devices.get(i).left);
+                if(i != devices.size() - 1) {
+                    this.writer.write(",");
                 }
-            });
+            }
         }
         this.writer.write(LINE);
     }
 
     public void writeStartDevice(String device) throws IOException {
-        this.writer.write("------startDevice");
+        this.writer.write(STARTDEVICE_MARK);
         this.writer.write(device);
         this.writer.write(LINE);
     }
@@ -84,12 +86,14 @@ public class TestCompareSnapshootLog implements AutoCloseable {
                 }
             });
         }
-        this.writer.write("------endMMap");
+        this.writer.write(ENDMMAP_MARK);
         this.writer.write(LINE);
     }
 
     public void write(String str) throws IOException {
         this.writer.write(str);
+        this.writer.write(LINE);
+        this.writer.write(ENDLINE_MARK);
         this.writer.write(LINE);
     }
 

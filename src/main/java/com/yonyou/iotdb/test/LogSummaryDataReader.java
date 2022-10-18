@@ -4,13 +4,15 @@ import org.apache.iotdb.tsfile.utils.Pair;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
-import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.SortedMap;
+import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 /**
  * 统计数据reader（log）
@@ -27,7 +29,7 @@ public class LogSummaryDataReader implements SummaryDataReader, AutoCloseable {
 
     private final Pattern HEADER_P = Pattern.compile("(.+):(\\d+):(\\d+):(true:false)");
 
-    public LogSummaryDataReader(File logFile) throws IOException {
+    public LogSummaryDataReader(File logFile) throws Exception {
         this.reader = new BufferedReader(new FileReader(logFile));
         String header = this.reader.readLine();
         Matcher matcher = HEADER_P.matcher(header);
@@ -37,77 +39,115 @@ public class LogSummaryDataReader implements SummaryDataReader, AutoCloseable {
             this.saveDataIntegrity = Boolean.valueOf(matcher.group(4));
         }
         this.version = this.reader.readLine();
-
+        String sgStr = this.reader.readLine();
+        if(sgStr == null || !sgStr.startsWith(TestCompareSnapshootLog.SGLIST_MARK)) {
+            throw new Exception("Error occurred while parsing sgList");
+        }
+        String[] sgs = sgStr.replaceFirst(TestCompareSnapshootLog.SGLIST_MARK, "").split(",");
+        sgList = Arrays.stream(sgs).collect(Collectors.toList());
     }
 
     @Override
     public long readEndTimestamp() {
-        return 0;
+        return endTimestamp;
     }
 
     @Override
     public boolean readSaveDataIntegrity() {
-        return false;
+        return saveDataIntegrity;
     }
 
     @Override
     public String readVersion() {
-        return null;
+        return version;
     }
 
     @Override
     public List<String> readSgList() {
-        return null;
+        return sgList;
     }
 
     @Override
-    public List<Pair<String, String>> readDevcieList(String sg) {
-        return null;
+    public List<Pair<String, String>> readDevcieList(String sg) throws Exception {
+        String sgStart = this.reader.readLine();
+        if(!(sg+TestCompareSnapshootLog.STARTSG_MARK).trim().equalsIgnoreCase(sgStart.trim())) {
+            throw new Exception("Error occurred while parsing sgStart");
+        }
+        String deviceStr = this.reader.readLine();
+        if(deviceStr == null || !deviceStr.startsWith(TestCompareSnapshootLog.DEVICELIST_MARK)) {
+            throw new Exception("Error occurred while parsing sgList");
+        }
+        String[] ds = deviceStr.replaceFirst(TestCompareSnapshootLog.DEVICELIST_MARK, "").split(",");
+        List<String> tempds = Arrays.stream(ds).collect(Collectors.toList());
+        List<Pair<String, String>> result = new ArrayList<>(tempds.size());
+        tempds.forEach(d->result.add(new Pair<>(d, "false")));
+        return result;
     }
 
     @Override
-    public SortedMap<String, String> readMMap(String device) {
-        return null;
+    public SortedMap<String, String> readMMap(String device) throws Exception {
+
+        String deviceStart = this.reader.readLine();
+        if(!(device+TestCompareSnapshootLog.STARTDEVICE_MARK).trim().equalsIgnoreCase(deviceStart.trim())) {
+            throw new Exception("Error occurred while parsing deviceStart");
+        }
+        SortedMap<String, String> mmap = new TreeMap<>();
+        String line = null;
+        while((line = this.reader.readLine()) != null && !line.equalsIgnoreCase(TestCompareSnapshootLog.ENDMMAP_MARK)) {
+            String measurement = line.substring(0, line.indexOf("->")+1);
+            mmap.put(measurement, line);
+        }
+        return mmap;
     }
 
     @Override
-    public String readCount(String device, long endTimestamp) {
-        return null;
+    public String readCount(String device, long endTimestamp) throws Exception {
+        return readString();
     }
 
     @Override
-    public String readMinMaxTime(String device, long endTimestamp) {
-        return null;
+    public String readMinMaxTime(String device, long endTimestamp) throws Exception {
+        return readString();
     }
 
     @Override
-    public String readCount(String device, long beginTime, long endTimestamp) {
-        return null;
+    public String readCount(String device, long beginTime, long endTimestamp) throws Exception {
+        return readString();
     }
 
     @Override
-    public String readMinMaxValue(String device, long beginTime, long endTimestamp) {
-        return null;
+    public String readMinMaxValue(String device, long beginTime, long endTimestamp) throws Exception {
+        return readString();
     }
 
     @Override
-    public String readLimitTop(String device, long beginTime, long endTimestamp, int count) {
-        return null;
+    public String readLimitTop(String device, long beginTime, long endTimestamp, int count) throws Exception {
+        return readString();
     }
 
     @Override
-    public String readLimitBottom(String device, long beginTime, long endTimestamp, int count) {
-        return null;
+    public String readLimitBottom(String device, long beginTime, long endTimestamp, int count) throws Exception {
+        return readString();
     }
 
     @Override
-    public String readTop(String device, long beginTime, long endTimestamp, int count) {
-        return null;
+    public String readTop(String device, long beginTime, long endTimestamp, int count) throws Exception {
+        return readString();
     }
 
     @Override
-    public String readBottom(String device, long beginTime, long endTimestamp, int count) {
-        return null;
+    public String readBottom(String device, long beginTime, long endTimestamp, int count) throws Exception {
+        return readString();
+    }
+
+    public String readString() throws Exception {
+        String line;
+        StringBuilder sb = new StringBuilder();
+        while((line = this.reader.readLine()) != null && !line.equalsIgnoreCase(TestCompareSnapshootLog.ENDLINE_MARK)) {
+            sb.append(line);
+            sb.append(System.lineSeparator());
+        }
+        return sb.toString();
     }
 
     @Override
