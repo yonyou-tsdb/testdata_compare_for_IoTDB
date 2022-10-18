@@ -14,6 +14,11 @@ import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * summary data export from IoTDB
+ *
+ * @author pengfeiliu
+ */
 public class SnapshootIoTDBSummary {
 
     public static final String REX_SOURCE = "(.+):(\\d+)@@(.+)@@(.+)";
@@ -23,11 +28,11 @@ public class SnapshootIoTDBSummary {
 
     public static void main(String[] args) throws Exception {
 
-        // 参数校验
-        // 1:源数据库ip:port@@username@@password
-        // 2:快照文件生成目录
+        // param check
+        // 1:data source ip:port@@username@@password
+        // 2:target file parent path
         // 3:endTimeStamp
-        // 4:是否完整保存数据
+        // 4:whether to save unencrypted data
         if(args.length < 2) {
             throw new Exception("参数错误，1:源数据库ip:port@@username@@password\n" +
                     "           2:快照文件生成目录\n" +
@@ -78,7 +83,7 @@ public class SnapshootIoTDBSummary {
         session.setFetchSize(100);
 
         try {
-            // 日志开始
+            // log start
             log.writeHeader(ip, port, endTimestamp, saveDataIntegrity);
             // -----schema export-------
             SessionDataSet versionSet = session.executeQueryStatement("show version");
@@ -149,7 +154,7 @@ public class SnapshootIoTDBSummary {
                     String countString = getResultString("count(*) " + curDevice, session, "select count(*) from " + curDevice + " where time<=" + endTimestamp);
                     System.out.println(countString);
                     log.write(countString);
-                    // 最大时间，最小时间
+                    // maxTime, minTime
                     String minTimeString = getResultString("minMaxTime(*) " + curDevice, session, "select min_time(*),max_time(*) from " + curDevice + " where time<=" + endTimestamp);
                     System.out.println(minTimeString);
                     log.write(minTimeString);
@@ -161,7 +166,7 @@ public class SnapshootIoTDBSummary {
                     String topSql = "select top_k(*,'k'='100') from %s where time > %d and time <= %d";
                     String bottomSql = "select bottom_k(*,'k'='100') from %s where time > %d and time <= %d";
                     log.write("day data----------");
-                    // 近一个月每天的数据cout，前100条，后100条，最大最小值
+                    // nearly a month of daily data, like count,top100,bottom100,minValue,maxValue
                     for (int k = 0; k < 30; k++) {
                         long beginTime = curEndTime - DAY_AGO;
                         String countd = getResultString("countd" + k + "(*) " + curDevice, session, String.format(countSql, curDevice, beginTime, curEndTime));
@@ -182,7 +187,7 @@ public class SnapshootIoTDBSummary {
                         curEndTime = beginTime;
                     }
                     log.write("month data----------");
-                    // 一年到上个月止的数据cout，前100条，后100条，最大最小值
+                    // one year to the last month data,like count,top100,bottom100,minValue,maxValue
                     for (int k = 0; k < 11; k++) {
                         long beginTime = curEndTime - MONTH_AGO;
                         String countm = getResultString("countm" + k + "(*) " + curDevice, session, String.format(countSql, curDevice, beginTime, curEndTime));
@@ -203,7 +208,7 @@ public class SnapshootIoTDBSummary {
                         curEndTime = beginTime;
                     }
                     log.write("year data----------");
-                    // 一年前的数据cout，前100条，后100条，最大最小值
+                    // data from a year ago cout,like count,top100,bottom100,minValue,maxValue
                     long beginTime = -1;
                     String county = getResultString("county(*) " + curDevice, session, String.format(countSql, curDevice, beginTime, curEndTime));
                     System.out.println(county);
