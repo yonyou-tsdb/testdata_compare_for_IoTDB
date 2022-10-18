@@ -155,9 +155,9 @@ public class SnapshootIoTDBSummary {
                     System.out.println(countString);
                     log.write(countString);
                     // maxTime, minTime
-                    String minTimeString = getResultString("minMaxTime(*) " + curDevice, session, "select min_time(*),max_time(*) from " + curDevice + " where time<=" + endTimestamp);
-                    System.out.println(minTimeString);
-                    log.write(minTimeString);
+                    String minMaxTimeString = getResultString("minMaxTime(*) " + curDevice, session, "select min_time(*),max_time(*) from " + curDevice + " where time<=" + endTimestamp);
+                    System.out.println(minMaxTimeString);
+                    log.write(minMaxTimeString);
                     // -----data detail export-------
                     long curEndTime = endTimestamp;
                     String countSql = "select count(*) from %s where time > %d and time <= %d";
@@ -169,19 +169,19 @@ public class SnapshootIoTDBSummary {
                     // nearly a month of daily data, like count,top100,bottom100,minValue,maxValue
                     for (int k = 0; k < 30; k++) {
                         long beginTime = curEndTime - DAY_AGO;
-                        String countd = getResultString("countd" + k + "(*) " + curDevice, session, String.format(countSql, curDevice, beginTime, curEndTime));
+                        String countd = getResultString("countd:" + beginTime + "->" + curEndTime + "(*) " + curDevice, session, String.format(countSql, curDevice, beginTime, curEndTime));
                         System.out.println(countd);
                         log.write(countd);
-                        String limitTopd = getResultString("limitTopd" + k + "(*) " + curDevice, session, String.format(limitTopSql, curDevice, beginTime, curEndTime));
+                        String limitTopd = getResultString("limitTopd" + beginTime + "->" + curEndTime + "(*) " + curDevice, session, String.format(limitTopSql, curDevice, beginTime, curEndTime));
                         System.out.println(limitTopd);
                         log.write(limitTopd);
-                        String limitBottomd = getResultString("limitBottomd" + k + "(*) " + curDevice, session, String.format(limitBottomSql, curDevice, beginTime, curEndTime));
+                        String limitBottomd = getResultString("limitBottomd" + beginTime + "->" + curEndTime + "(*) " + curDevice, session, String.format(limitBottomSql, curDevice, beginTime, curEndTime));
                         System.out.println(limitBottomd);
                         log.write(limitBottomd);
-                        String topd = getResultString("topd" + k + "(*) " + curDevice, session, String.format(topSql, curDevice, beginTime, curEndTime));
+                        String topd = getResultString("topd" + beginTime + "->" + curEndTime + "(*) " + curDevice, session, String.format(topSql, curDevice, beginTime, curEndTime));
                         System.out.println(topd);
                         log.write(topd);
-                        String bottomd = getResultString("bottomd" + k + "(*) " + curDevice, session, String.format(bottomSql, curDevice, beginTime, curEndTime));
+                        String bottomd = getResultString("bottomd" + beginTime + "->" + curEndTime + "(*) " + curDevice, session, String.format(bottomSql, curDevice, beginTime, curEndTime));
                         System.out.println(bottomd);
                         log.write(bottomd);
                         curEndTime = beginTime;
@@ -190,19 +190,19 @@ public class SnapshootIoTDBSummary {
                     // one year to the last month data,like count,top100,bottom100,minValue,maxValue
                     for (int k = 0; k < 11; k++) {
                         long beginTime = curEndTime - MONTH_AGO;
-                        String countm = getResultString("countm" + k + "(*) " + curDevice, session, String.format(countSql, curDevice, beginTime, curEndTime));
+                        String countm = getResultString("countm" + beginTime + "->" + curEndTime + "(*) " + curDevice, session, String.format(countSql, curDevice, beginTime, curEndTime));
                         System.out.println(countm);
                         log.write(countm);
-                        String limitTopm = getResultString("limitTopm" + k + "(*) " + curDevice, session, String.format(limitTopSql, curDevice, beginTime, curEndTime));
+                        String limitTopm = getResultString("limitTopm" + beginTime + "->" + curEndTime + "(*) " + curDevice, session, String.format(limitTopSql, curDevice, beginTime, curEndTime));
                         System.out.println(limitTopm);
                         log.write(limitTopm);
-                        String limitBottomm = getResultString("limitBottomm" + k + "(*) " + curDevice, session, String.format(limitBottomSql, curDevice, beginTime, curEndTime));
+                        String limitBottomm = getResultString("limitBottomm" + beginTime + "->" + curEndTime + "(*) " + curDevice, session, String.format(limitBottomSql, curDevice, beginTime, curEndTime));
                         System.out.println(limitBottomm);
                         log.write(limitBottomm);
-                        String topm = getResultString("topm" + k + "(*) " + curDevice, session, String.format(topSql, curDevice, beginTime, curEndTime));
+                        String topm = getResultString("topm" + beginTime + "->" + curEndTime + "(*) " + curDevice, session, String.format(topSql, curDevice, beginTime, curEndTime));
                         System.out.println(topm);
                         log.write(topm);
-                        String bottomm = getResultString("bottomm" + k + "(*) " + curDevice, session, String.format(bottomSql, curDevice, beginTime, curEndTime));
+                        String bottomm = getResultString("bottomm" + beginTime + "->" + curEndTime + "(*) " + curDevice, session, String.format(bottomSql, curDevice, beginTime, curEndTime));
                         System.out.println(bottomm);
                         log.write(bottomm);
                         curEndTime = beginTime;
@@ -210,19 +210,19 @@ public class SnapshootIoTDBSummary {
                     log.write("year data----------");
                     // data from a year ago cout,like count,top100,bottom100,minValue,maxValue
                     long beginTime = -1;
-                    String county = getResultString("county(*) " + curDevice, session, String.format(countSql, curDevice, beginTime, curEndTime));
+                    String county = getResultString("county" + beginTime + "->" + curEndTime + "(*) " + curDevice, session, String.format(countSql, curDevice, beginTime, curEndTime));
                     System.out.println(county);
                     log.write(county);
-                    String limitTopy = getResultString("limitTopy(*) " + curDevice, session, String.format(limitTopSql, curDevice, beginTime, curEndTime));
+                    String limitTopy = getResultString("limitTopy" + beginTime + "->" + curEndTime + "(*) " + curDevice, session, String.format(limitTopSql, curDevice, beginTime, curEndTime));
                     System.out.println(limitTopy);
                     log.write(limitTopy);
-                    String limitBottomy = getResultString("limitBottomy(*) " + curDevice, session, String.format(limitBottomSql, curDevice, beginTime, curEndTime));
+                    String limitBottomy = getResultString("limitBottomy" + beginTime + "->" + curEndTime + "(*) " + curDevice, session, String.format(limitBottomSql, curDevice, beginTime, curEndTime));
                     System.out.println(limitBottomy);
                     log.write(limitBottomy);
-                    String topy = getResultString("topy(*) " + curDevice, session, String.format(topSql, curDevice, beginTime, curEndTime));
+                    String topy = getResultString("topy" + beginTime + "->" + curEndTime + "(*) " + curDevice, session, String.format(topSql, curDevice, beginTime, curEndTime));
                     System.out.println(topy);
                     log.write(topy);
-                    String bottomy = getResultString("bottomy(*) " + curDevice, session, String.format(bottomSql, curDevice, beginTime, curEndTime));
+                    String bottomy = getResultString("bottomy" + beginTime + "->" + curEndTime + "(*) " + curDevice, session, String.format(bottomSql, curDevice, beginTime, curEndTime));
                     System.out.println(bottomy);
                     log.write(bottomy);
                 }

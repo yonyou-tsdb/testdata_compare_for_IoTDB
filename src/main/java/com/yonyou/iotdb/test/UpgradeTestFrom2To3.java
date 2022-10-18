@@ -7,11 +7,21 @@ public class UpgradeTestFrom2To3 {
 
     public static void main(String[] args) throws Exception {
 
-        // 参数校验
+        // param check
         // 1:概要快照文件/目标数据库ip:port@username@password，如果是文件则以f:开头
         // 2:目标数据库ip:port@username@password
-
+        if(args.length < 2) {
+            throw new Exception("参数错误，1:概要快照文件/目标数据库ip:port@username@password，如果是文件则以f:开头\n" +
+                    "           2:目标数据库ip:port@username@password");
+        }
         // new source/target session
+        String source = args[0];
+        if(source.startsWith("f:")) {
+
+        } else {
+
+        }
+
         // open
         // set fetch size
 
