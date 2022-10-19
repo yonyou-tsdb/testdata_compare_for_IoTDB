@@ -27,7 +27,7 @@ public class LogSummaryDataReader implements SummaryDataReader, AutoCloseable {
     private String version;
     private List<String> sgList;
 
-    private final Pattern HEADER_P = Pattern.compile("(.+):(\\d+):(\\d+):(true:false)");
+    private final Pattern HEADER_P = Pattern.compile("(.+):(\\d+):(\\d+):(true|false)");
 
     public LogSummaryDataReader(File logFile) throws Exception {
         this.reader = new BufferedReader(new FileReader(logFile));
@@ -70,7 +70,7 @@ public class LogSummaryDataReader implements SummaryDataReader, AutoCloseable {
     @Override
     public List<Pair<String, String>> readDevcieList(String sg) throws Exception {
         String sgStart = this.reader.readLine();
-        if(!(sg+TestCompareSnapshootLog.STARTSG_MARK).trim().equalsIgnoreCase(sgStart.trim())) {
+        if(!(TestCompareSnapshootLog.STARTSG_MARK+sg).trim().equalsIgnoreCase(sgStart.trim())) {
             throw new Exception("Error occurred while parsing sgStart");
         }
         String deviceStr = this.reader.readLine();
@@ -88,14 +88,14 @@ public class LogSummaryDataReader implements SummaryDataReader, AutoCloseable {
     public SortedMap<String, String> readMMap(String device) throws Exception {
 
         String deviceStart = this.reader.readLine();
-        if(!(device+TestCompareSnapshootLog.STARTDEVICE_MARK).trim().equalsIgnoreCase(deviceStart.trim())) {
+        if(!(TestCompareSnapshootLog.STARTDEVICE_MARK+device).trim().equalsIgnoreCase(deviceStart.trim())) {
             throw new Exception("Error occurred while parsing deviceStart");
         }
         SortedMap<String, String> mmap = new TreeMap<>();
         String line = null;
         while((line = this.reader.readLine()) != null && !line.equalsIgnoreCase(TestCompareSnapshootLog.ENDMMAP_MARK)) {
-            String measurement = line.substring(0, line.indexOf("->")+1);
-            mmap.put(measurement, line);
+            String measurement = line.substring(0, line.indexOf("->"));
+            mmap.put(measurement, line.substring(line.indexOf("->")+2));
         }
         return mmap;
     }
@@ -111,32 +111,27 @@ public class LogSummaryDataReader implements SummaryDataReader, AutoCloseable {
     }
 
     @Override
-    public String readCount(String device, long beginTime, long endTimestamp) throws Exception {
+    public String readCount(String mark, String device, long beginTime, long endTimestamp) throws Exception {
         return readString();
     }
 
     @Override
-    public String readMinMaxValue(String device, long beginTime, long endTimestamp) throws Exception {
+    public String readLimitTop(String mark, String device, long beginTime, long endTimestamp, int count) throws Exception {
         return readString();
     }
 
     @Override
-    public String readLimitTop(String device, long beginTime, long endTimestamp, int count) throws Exception {
+    public String readLimitBottom(String mark, String device, long beginTime, long endTimestamp, int count) throws Exception {
         return readString();
     }
 
     @Override
-    public String readLimitBottom(String device, long beginTime, long endTimestamp, int count) throws Exception {
+    public String readTop(String mark, String device, long beginTime, long endTimestamp, int count) throws Exception {
         return readString();
     }
 
     @Override
-    public String readTop(String device, long beginTime, long endTimestamp, int count) throws Exception {
-        return readString();
-    }
-
-    @Override
-    public String readBottom(String device, long beginTime, long endTimestamp, int count) throws Exception {
+    public String readBottom(String mark, String device, long beginTime, long endTimestamp, int count) throws Exception {
         return readString();
     }
 

@@ -165,11 +165,11 @@ public class SnapshootIoTDBSummary {
                     String limitBottomSql = "select * from %s where time > %d and time <= %d order by time desc limit 100";
                     String topSql = "select top_k(*,'k'='100') from %s where time > %d and time <= %d";
                     String bottomSql = "select bottom_k(*,'k'='100') from %s where time > %d and time <= %d";
-                    log.write("day data----------");
+//                    log.write("day data----------");
                     // nearly a month of daily data, like count,top100,bottom100,minValue,maxValue
                     for (int k = 0; k < 30; k++) {
                         long beginTime = curEndTime - DAY_AGO;
-                        String countd = getResultString("countd:" + beginTime + "->" + curEndTime + "(*) " + curDevice, session, String.format(countSql, curDevice, beginTime, curEndTime));
+                        String countd = getResultString("countd" + beginTime + "->" + curEndTime + "(*) " + curDevice, session, String.format(countSql, curDevice, beginTime, curEndTime));
                         System.out.println(countd);
                         log.write(countd);
                         String limitTopd = getResultString("limitTopd" + beginTime + "->" + curEndTime + "(*) " + curDevice, session, String.format(limitTopSql, curDevice, beginTime, curEndTime));
@@ -186,7 +186,7 @@ public class SnapshootIoTDBSummary {
                         log.write(bottomd);
                         curEndTime = beginTime;
                     }
-                    log.write("month data----------");
+//                    log.write("month data----------");
                     // one year to the last month data,like count,top100,bottom100,minValue,maxValue
                     for (int k = 0; k < 11; k++) {
                         long beginTime = curEndTime - MONTH_AGO;
@@ -207,7 +207,7 @@ public class SnapshootIoTDBSummary {
                         log.write(bottomm);
                         curEndTime = beginTime;
                     }
-                    log.write("year data----------");
+//                    log.write("year data----------");
                     // data from a year ago cout,like count,top100,bottom100,minValue,maxValue
                     long beginTime = -1;
                     String county = getResultString("county" + beginTime + "->" + curEndTime + "(*) " + curDevice, session, String.format(countSql, curDevice, beginTime, curEndTime));
