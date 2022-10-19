@@ -5,7 +5,7 @@ import org.apache.iotdb.tsfile.utils.Pair;
 import java.util.List;
 import java.util.SortedMap;
 
-public interface SummaryDataReader {
+public interface SummaryDataReader extends AutoCloseable {
 
     long readEndTimestamp();
 

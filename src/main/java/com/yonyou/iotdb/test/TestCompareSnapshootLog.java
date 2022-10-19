@@ -10,7 +10,6 @@ import java.util.SortedMap;
 
 public class TestCompareSnapshootLog implements AutoCloseable {
 
-    private File logFile;
     private FileWriter writer;
     private static String LINE = System.lineSeparator();
     public static final String SGLIST_MARK = "----------sgList";
@@ -21,7 +20,6 @@ public class TestCompareSnapshootLog implements AutoCloseable {
     public static final String ENDLINE_MARK = "------endLine";
 
     public TestCompareSnapshootLog(File logFile) throws IOException {
-        this.logFile = logFile;
         this.writer = new FileWriter(logFile);
     }
 

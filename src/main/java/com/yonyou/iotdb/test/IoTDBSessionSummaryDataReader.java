@@ -83,4 +83,11 @@ public class IoTDBSessionSummaryDataReader implements SummaryDataReader {
     public String readBottom(String device, long beginTime, long endTimestamp, int count) throws Exception {
         return null;
     }
+
+    @Override
+    public void close() throws Exception {
+        if(this.session != null) {
+            this.session.close();
+        }
+    }
 }
