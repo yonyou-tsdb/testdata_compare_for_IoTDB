@@ -11,6 +11,11 @@ import java.util.regex.Pattern;
 import static com.yonyou.iotdb.test.SnapshootIoTDBSummary.DAY_AGO;
 import static com.yonyou.iotdb.test.SnapshootIoTDBSummary.MONTH_AGO;
 
+/**
+ * summary data compare with IoTDB
+ *
+ * @author pengfeiliu
+ */
 public class UpgradeTestFrom2To3 {
 
     public static void main(String[] args) throws Exception {
