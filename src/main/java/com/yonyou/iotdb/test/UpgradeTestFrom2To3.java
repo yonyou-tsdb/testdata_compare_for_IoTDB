@@ -121,6 +121,7 @@ public class UpgradeTestFrom2To3 {
                     readAndCompareData("y" ,reader, targetReader, j, device, limit, curEndTime, 0, -1);
                 }
             }
+            System.out.println("对比完成");
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
