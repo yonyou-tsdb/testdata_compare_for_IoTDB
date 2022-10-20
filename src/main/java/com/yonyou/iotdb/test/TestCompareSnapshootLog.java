@@ -23,8 +23,8 @@ public class TestCompareSnapshootLog implements AutoCloseable {
         this.writer = new FileWriter(logFile);
     }
 
-    public void writeHeader(String ip, String port, long endTimestamp, boolean saveDataIntegrity) throws IOException {
-        this.writer.write(ip + ":" + port + ":" + endTimestamp + ":" + saveDataIntegrity);
+    public void writeHeader(long endTimestamp, boolean saveDataIntegrity) throws IOException {
+        this.writer.write(endTimestamp + ":" + saveDataIntegrity);
         this.writer.write(LINE);
     }
 

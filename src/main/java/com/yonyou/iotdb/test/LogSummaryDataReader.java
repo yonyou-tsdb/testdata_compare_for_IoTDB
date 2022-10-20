@@ -27,16 +27,15 @@ public class LogSummaryDataReader implements SummaryDataReader, AutoCloseable {
     private String version;
     private List<String> sgList;
 
-    private final Pattern HEADER_P = Pattern.compile("(.+):(\\d+):(\\d+):(true|false)");
+    private final Pattern HEADER_P = Pattern.compile("(\\d+):(true|false)");
 
     public LogSummaryDataReader(File logFile) throws Exception {
         this.reader = new BufferedReader(new FileReader(logFile));
         String header = this.reader.readLine();
         Matcher matcher = HEADER_P.matcher(header);
         if(matcher.find()) {
-            System.out.println("source:" + matcher.group(1) + ":" + matcher.group(2));
-            this.endTimestamp = Long.valueOf(matcher.group(3));
-            this.saveDataIntegrity = Boolean.valueOf(matcher.group(4));
+            this.endTimestamp = Long.valueOf(matcher.group(1));
+            this.saveDataIntegrity = Boolean.valueOf(matcher.group(2));
         }
         this.version = this.reader.readLine();
         String sgStr = this.reader.readLine();

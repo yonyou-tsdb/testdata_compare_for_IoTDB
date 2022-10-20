@@ -15,13 +15,14 @@ public class IoTDBSessionSummaryDataReader implements SummaryDataReader {
     private final String countSql = "select count(*) from %s where time > %d and time <= %d";
     private final String limitTopSql = "select * from %s where time > %d and time <= %d order by time limit %d";
     private final String limitBottomSql = "select * from %s where time > %d and time <= %d order by time desc limit %d";
-    private final String topSql = "select top_k(*,'k'='100') from %s where time > %d and time <= %d";
-    private final String bottomSql = "select bottom_k(*,'k'='100') from %s where time > %d and time <= %d";
+    private final String topSql = "select top_k(*,'k'='%d') from %s where time > %d and time <= %d";
+    private final String bottomSql = "select bottom_k(*,'k'='%d') from %s where time > %d and time <= %d";
 
     public IoTDBSessionSummaryDataReader(Session session) throws Exception {
         this.session = session;
         session.open(false);
         session.setFetchSize(100);
+        session.setQueryTimeout(60000);
         SessionDataSet versionSet = session.executeQueryStatement("show version");
         SessionDataSet.DataIterator vit = versionSet.iterator();
         vit.next();
@@ -37,6 +38,7 @@ public class IoTDBSessionSummaryDataReader implements SummaryDataReader {
         } else {
             throw new Exception("仅支持iotdb v0.12 v0.13");
         }
+        session.setVersion(curVersion);
     }
 
     @Override
@@ -129,12 +131,12 @@ public class IoTDBSessionSummaryDataReader implements SummaryDataReader {
 
     @Override
     public String readTop(String mark, String device, long beginTime, long endTimestamp, int count) throws Exception {
-        return getResultString(mark + beginTime + "->" + endTimestamp + "(*) " + device, session, String.format(topSql, device, beginTime, endTimestamp, count));
+        return getResultString(mark + beginTime + "->" + endTimestamp + "(*) " + device, session, String.format(topSql, count, device, beginTime, endTimestamp));
     }
 
     @Override
     public String readBottom(String mark, String device, long beginTime, long endTimestamp, int count) throws Exception {
-        return getResultString(mark + beginTime + "->" + endTimestamp + "(*) " + device, session, String.format(bottomSql, device, beginTime, endTimestamp, count));
+        return getResultString(mark + beginTime + "->" + endTimestamp + "(*) " + device, session, String.format(bottomSql, count, device, beginTime, endTimestamp));
     }
 
     @Override
@@ -168,7 +170,7 @@ public class IoTDBSessionSummaryDataReader implements SummaryDataReader {
     }
 
     private static String getValue(String type, String columnName, SessionDataSet.DataIterator it) throws Exception {
-        SnapshootIoTDBSummary.DataType dataType = SnapshootIoTDBSummary.DataType.getDataType(type);
+        DataType dataType = DataType.getDataType(type);
         if(dataType == null) {
             return null;
         }

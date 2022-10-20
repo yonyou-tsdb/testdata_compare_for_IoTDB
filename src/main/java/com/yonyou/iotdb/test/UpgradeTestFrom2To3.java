@@ -1,7 +1,6 @@
 package com.yonyou.iotdb.test;
 
 import org.apache.iotdb.session.Session;
-import org.apache.iotdb.session.SessionDataSet;
 import org.apache.iotdb.tsfile.utils.Pair;
 
 import java.io.File;
@@ -120,12 +119,8 @@ public class UpgradeTestFrom2To3 {
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            if(reader != null) {
-                reader.close();
-            }
-            if(targetReader != null) {
-                targetReader.close();
-            }
+            reader.close();
+            targetReader.close();
         }
 
     }
@@ -158,7 +153,7 @@ public class UpgradeTestFrom2To3 {
         }
     }
 
-    private static IoTDBSessionSummaryDataReader getSummaryDataReader(String source) throws Exception {
+    public static IoTDBSessionSummaryDataReader getSummaryDataReader(String source) throws Exception {
         IoTDBSessionSummaryDataReader reader;
         Pattern compile = Pattern.compile(SnapshootIoTDBSummary.REX_SOURCE);
         Matcher matcher = compile.matcher(source);
