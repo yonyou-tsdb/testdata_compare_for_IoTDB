@@ -41,9 +41,11 @@ public class UpgradeTestFrom2To3 {
         }
         String target = args[1];
         IoTDBSessionSummaryDataReader targetReader = getSummaryDataReader(target);
-
+        long compareBeginTime = System.currentTimeMillis();
+        boolean compareSuccess = false;
         try {
             long endTimestamp = reader.readEndTimestamp();
+            boolean saveDataIntegrity = reader.readSaveDataIntegrity();
             List<String> sgList = reader.readSgList();
             List<String> sgListTarget = targetReader.readSgList();
             if(sgList == null || sgListTarget == null || sgList.size() != sgListTarget.size()) {
@@ -108,30 +110,31 @@ public class UpgradeTestFrom2To3 {
                     long curEndTime = endTimestamp;
                     for (int k = 0; k < 30; k++) {
                         long beginTime = curEndTime - DAY_AGO;
-                        readAndCompareData("d" ,reader, targetReader, j, device, limit, curEndTime, k, beginTime);
+                        readAndCompareData("d" ,reader, targetReader, j, device, limit, curEndTime, k, beginTime, saveDataIntegrity);
                         curEndTime = beginTime;
                     }
                     // one year to the last month data,like count,top100,bottom100,minValue,maxValue
                     for (int k = 0; k < 11; k++) {
                         long beginTime = curEndTime - MONTH_AGO;
-                        readAndCompareData("m" ,reader, targetReader, j, device, limit, curEndTime, k, beginTime);
+                        readAndCompareData("m" ,reader, targetReader, j, device, limit, curEndTime, k, beginTime, saveDataIntegrity);
                         curEndTime = beginTime;
                     }
                     // data from a year ago cout,like count,top100,bottom100,minValue,maxValue
-                    readAndCompareData("y" ,reader, targetReader, j, device, limit, curEndTime, 0, -1);
+                    readAndCompareData("y" ,reader, targetReader, j, device, limit, curEndTime, 0, -1, saveDataIntegrity);
                 }
             }
-            System.out.println("对比完成");
+            compareSuccess = true;
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
             reader.close();
             targetReader.close();
         }
+        System.out.println("完成对比，结果："+compareSuccess+"，耗时:" + (System.currentTimeMillis() - compareBeginTime) + "ms");
 
     }
 
-    private static void readAndCompareData(String markPre, SummaryDataReader reader, IoTDBSessionSummaryDataReader targetReader, int j, Pair<String, String> device, int limit, long curEndTime, int k, long beginTime) throws Exception {
+    private static void readAndCompareData(String markPre, SummaryDataReader reader, IoTDBSessionSummaryDataReader targetReader, int j, Pair<String, String> device, int limit, long curEndTime, int k, long beginTime, boolean saveDataIntegrity) throws Exception {
         String count = reader.readCount("count" + markPre, device.left, beginTime, curEndTime);
         String countTarget = targetReader.readCount("count" + markPre, device.left, beginTime, curEndTime);
         if(!Objects.equals(count.trim(), countTarget.trim())) {
@@ -139,21 +142,33 @@ public class UpgradeTestFrom2To3 {
         }
         String limitTop = reader.readLimitTop("limitTop" + markPre, device.left, beginTime, curEndTime, limit);
         String limitTopTarget = targetReader.readLimitTop("limitTop" + markPre, device.left, beginTime, curEndTime, limit);
+        if(!saveDataIntegrity) {
+            limitTopTarget = SnapshootIoTDBSummary.encrypt2MD5(limitTopTarget);
+        }
         if(!Objects.equals(limitTop.trim(), limitTopTarget.trim())) {
             throw new Exception("device " + j + "-" + k + " limitTop compare fail, "+limitTop+" ≠" + limitTopTarget);
         }
         String limitBottom = reader.readLimitBottom("limitBottom" + markPre, device.left, beginTime, curEndTime, limit);
         String limitBottomTarget = targetReader.readLimitBottom("limitBottom" + markPre, device.left, beginTime, curEndTime, limit);
+        if(!saveDataIntegrity) {
+            limitBottomTarget = SnapshootIoTDBSummary.encrypt2MD5(limitBottomTarget);
+        }
         if(!Objects.equals(limitBottom.trim(), limitBottomTarget.trim())) {
             throw new Exception("device " + j + "-" + k + " limitBottom compare fail, "+limitBottom+" ≠" + limitBottomTarget);
         }
         String top = reader.readTop("top" + markPre, device.left, beginTime, curEndTime, limit);
         String topTarget = targetReader.readTop("top" + markPre, device.left, beginTime, curEndTime, limit);
+        if(!saveDataIntegrity) {
+            topTarget = SnapshootIoTDBSummary.encrypt2MD5(topTarget);
+        }
         if(!Objects.equals(top.trim(), topTarget.trim())) {
             throw new Exception("device " + j + "-" + k + " top compare fail, "+top+" ≠" + topTarget);
         }
         String bottom = reader.readBottom("bottom" + markPre, device.left, beginTime, curEndTime, limit);
         String bottomTarget = targetReader.readBottom("bottom" + markPre, device.left, beginTime, curEndTime, limit);
+        if(!saveDataIntegrity) {
+            bottomTarget = SnapshootIoTDBSummary.encrypt2MD5(bottomTarget);
+        }
         if(!Objects.equals(bottom.trim(), bottomTarget.trim())) {
             throw new Exception("device " + j + "-" + k + " bottom compare fail, "+bottom+" ≠" + bottomTarget);
         }
