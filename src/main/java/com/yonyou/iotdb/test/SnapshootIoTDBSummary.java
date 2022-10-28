@@ -1,12 +1,15 @@
 package com.yonyou.iotdb.test;
 
+import org.apache.iotdb.rpc.IoTDBConnectionException;
+import org.apache.iotdb.rpc.StatementExecutionException;
+import org.apache.iotdb.session.Session;
+import org.apache.iotdb.session.SessionDataSet;
 import org.apache.iotdb.session.util.Version;
 import org.apache.iotdb.tsfile.utils.Pair;
 
 import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.Collections;
 import java.util.List;
 import java.util.SortedMap;
@@ -33,8 +36,9 @@ public class SnapshootIoTDBSummary {
         if(args.length < 2) {
             throw new Exception("参数错误，1:源数据库ip:port@@username@@password\n" +
                     "           2:快照文件生成目录\n" +
-                    "           3:endTimeStamp，默认当前时间\n" +
-                    "           4:是否完整保存数据，默认md5保存");
+                    "           3:是否自动设置readonly和flush，默认否\n" +
+                    "           4:endTimeStamp，默认当前时间\n" +
+                    "           5:是否完整保存数据，默认md5保存");
         }
         // new source/target session
         // open
@@ -43,11 +47,16 @@ public class SnapshootIoTDBSummary {
         String outputDirStr = args[1];
         String endTimestampStr = null;
         String saveDataIntegrityStr = null;
+        String autoFlushStr = null;
         if(args.length == 3) {
-            endTimestampStr = args[2];
-        } else if(args.length >= 4) {
-            endTimestampStr = args[2];
-            saveDataIntegrityStr = args[3];
+            autoFlushStr = args[2];
+        } else if(args.length == 4) {
+            autoFlushStr = args[2];
+            endTimestampStr = args[3];
+        } else if(args.length >= 5) {
+            autoFlushStr = args[2];
+            endTimestampStr = args[3];
+            saveDataIntegrityStr = args[4];
         }
         IoTDBSessionSummaryDataReader reader = UpgradeTestFrom2To3.getSummaryDataReader(source);
         File outputDir = new File(outputDirStr);
@@ -67,9 +76,28 @@ public class SnapshootIoTDBSummary {
         if(saveDataIntegrityStr != null) {
             saveDataIntegrity = Boolean.parseBoolean(saveDataIntegrityStr);
         }
+        boolean autoFlush = false;
+        if(autoFlushStr != null) {
+            autoFlush = Boolean.parseBoolean(autoFlushStr);
+        }
         long exportBeginTime = System.currentTimeMillis();
 
         try {
+            // auto set readonly and flush
+            if(autoFlush) {
+                Session session = reader.getSession();
+                session.executeNonQueryStatement("SET SYSTEM TO READONLY");
+                session.executeNonQueryStatement("flush");
+                for (int i = 0; i < 10; i++) {
+                    if(checkFlushOver(session)) {
+                        break;
+                    }
+                    if(i == 9) {
+                        throw new Exception("please waiting for flush");
+                    }
+                    Thread.sleep(2000);
+                }
+            }
             // log start
             log.writeHeader(endTimestamp, saveDataIntegrity);
             // -----schema export-------
@@ -184,6 +212,18 @@ public class SnapshootIoTDBSummary {
             log.close();
         }
         System.out.println("完成导出，耗时:" + (System.currentTimeMillis() - exportBeginTime) + "ms");
+    }
+
+    private static boolean checkFlushOver(Session session) throws StatementExecutionException, IoTDBConnectionException {
+        SessionDataSet taskInfoSet = session.executeQueryStatement("show flush task info");
+        SessionDataSet.DataIterator it = taskInfoSet.iterator();
+        while (it.next()) {
+            int value = it.getInt("value");
+            if(value != 0) {
+                return false;
+            }
+        }
+        return true;
     }
 
     public static String encrypt2MD5(String str) throws Exception {

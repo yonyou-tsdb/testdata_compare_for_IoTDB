@@ -146,6 +146,10 @@ public class IoTDBSessionSummaryDataReader implements SummaryDataReader {
         }
     }
 
+    public Session getSession() {
+        return session;
+    }
+
     private static String getResultString(String topStr, Session session, String sql) throws Exception {
         SessionDataSet set = session.executeQueryStatement(sql);
         List<String> columnNames = set.getColumnNames();
