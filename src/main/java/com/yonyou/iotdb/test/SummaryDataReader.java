@@ -31,7 +31,7 @@ public interface SummaryDataReader extends AutoCloseable {
 
     String readLimitBottom(String mark, String device, long beginTime, long endTimestamp, int count) throws Exception;
 
-    String readTop(String mark, String device, long beginTime, long endTimestamp, int count) throws Exception;
-
-    String readBottom(String mark, String device, long beginTime, long endTimestamp, int count) throws Exception;
+//    String readTop(String mark, String device, long beginTime, long endTimestamp, int count) throws Exception;
+//
+//    String readBottom(String mark, String device, long beginTime, long endTimestamp, int count) throws Exception;
 }

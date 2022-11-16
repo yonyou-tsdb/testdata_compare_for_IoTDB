@@ -145,8 +145,8 @@ public class SnapshootIoTDBSummary {
                     int limit = 100;
 //                    log.write("day data----------");
                     // nearly a month of daily data, like count,top100,bottom100,minValue,maxValue
-                    for (int k = 0; k < 30; k++) {
-                        long beginTime = curEndTime - DAY_AGO;
+//                    for (int k = 0; k < 30; k++) {
+                        long beginTime = curEndTime - DAY_AGO * 30;
                         String countd = reader.readCount("countd", curDevice, beginTime, curEndTime);
                         System.out.println(countd);
                         log.write(countd);
@@ -156,18 +156,18 @@ public class SnapshootIoTDBSummary {
                         String limitBottomd = reader.readLimitBottom("limitBottomd", curDevice, beginTime, curEndTime, limit);
                         System.out.println(limitBottomd);
                         log.write(saveDataIntegrity? limitBottomd : encrypt2MD5(limitBottomd));
-                        String topd = reader.readTop("topd", curDevice, beginTime, curEndTime, limit);
-                        System.out.println(topd);
-                        log.write(saveDataIntegrity? topd : encrypt2MD5(topd));
-                        String bottomd = reader.readBottom("bottomd", curDevice, beginTime, curEndTime, limit);
-                        System.out.println(bottomd);
-                        log.write(saveDataIntegrity? bottomd : encrypt2MD5(bottomd));
+//                        String topd = reader.readTop("topd", curDevice, beginTime, curEndTime, limit);
+//                        System.out.println(topd);
+//                        log.write(saveDataIntegrity? topd : encrypt2MD5(topd));
+//                        String bottomd = reader.readBottom("bottomd", curDevice, beginTime, curEndTime, limit);
+//                        System.out.println(bottomd);
+//                        log.write(saveDataIntegrity? bottomd : encrypt2MD5(bottomd));
                         curEndTime = beginTime;
-                    }
+//                    }
 //                    log.write("month data----------");
                     // one year to the last month data,like count,top100,bottom100,minValue,maxValue
-                    for (int k = 0; k < 11; k++) {
-                        long beginTime = curEndTime - MONTH_AGO;
+//                    for (int k = 0; k < 11; k++) {
+                        beginTime = curEndTime - MONTH_AGO * 11;
                         String countm = reader.readCount("countm", curDevice, beginTime, curEndTime);
                         System.out.println(countm);
                         log.write(countm);
@@ -177,17 +177,17 @@ public class SnapshootIoTDBSummary {
                         String limitBottomm = reader.readLimitBottom("limitBottomm", curDevice, beginTime, curEndTime, limit);
                         System.out.println(limitBottomm);
                         log.write(saveDataIntegrity? limitBottomm : encrypt2MD5(limitBottomm));
-                        String topm = reader.readTop("topm", curDevice, beginTime, curEndTime, limit);
-                        System.out.println(topm);
-                        log.write(saveDataIntegrity? topm : encrypt2MD5(topm));
-                        String bottomm = reader.readBottom("bottomm", curDevice, beginTime, curEndTime, limit);
-                        System.out.println(bottomm);
-                        log.write(saveDataIntegrity? bottomm : encrypt2MD5(bottomm));
+//                        String topm = reader.readTop("topm", curDevice, beginTime, curEndTime, limit);
+//                        System.out.println(topm);
+//                        log.write(saveDataIntegrity? topm : encrypt2MD5(topm));
+//                        String bottomm = reader.readBottom("bottomm", curDevice, beginTime, curEndTime, limit);
+//                        System.out.println(bottomm);
+//                        log.write(saveDataIntegrity? bottomm : encrypt2MD5(bottomm));
                         curEndTime = beginTime;
-                    }
+//                    }
 //                    log.write("year data----------");
                     // data from a year ago cout,like count,top100,bottom100,minValue,maxValue
-                    long beginTime = -1;
+                    beginTime = -1;
                     String county = reader.readCount("county", curDevice, beginTime, curEndTime);
                     System.out.println(county);
                     log.write(county);
@@ -197,12 +197,12 @@ public class SnapshootIoTDBSummary {
                     String limitBottomy = reader.readLimitBottom("limitBottomy", curDevice, beginTime, curEndTime, limit);
                     System.out.println(limitBottomy);
                     log.write(saveDataIntegrity? limitBottomy : encrypt2MD5(limitBottomy));
-                    String topy = reader.readTop("topy", curDevice, beginTime, curEndTime, limit);
-                    System.out.println(topy);
-                    log.write(saveDataIntegrity? topy : encrypt2MD5(topy));
-                    String bottomy = reader.readBottom("bottomy", curDevice, beginTime, curEndTime, limit);
-                    System.out.println(bottomy);
-                    log.write(saveDataIntegrity? bottomy : encrypt2MD5(bottomy));
+//                    String topy = reader.readTop("topy", curDevice, beginTime, curEndTime, limit);
+//                    System.out.println(topy);
+//                    log.write(saveDataIntegrity? topy : encrypt2MD5(topy));
+//                    String bottomy = reader.readBottom("bottomy", curDevice, beginTime, curEndTime, limit);
+//                    System.out.println(bottomy);
+//                    log.write(saveDataIntegrity? bottomy : encrypt2MD5(bottomy));
                 }
             }
         } catch (Exception e) {

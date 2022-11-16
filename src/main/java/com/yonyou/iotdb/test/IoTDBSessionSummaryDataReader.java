@@ -12,17 +12,17 @@ public class IoTDBSessionSummaryDataReader implements SummaryDataReader {
     private final Session session;
     private Version curVersion;
 
-    private final String countSql = "select count(*) from %s where time > %d and time <= %d";
-    private final String limitTopSql = "select * from %s where time > %d and time <= %d order by time limit %d";
-    private final String limitBottomSql = "select * from %s where time > %d and time <= %d order by time desc limit %d";
-    private final String topSql = "select top_k(*,'k'='%d') from %s where time > %d and time <= %d";
-    private final String bottomSql = "select bottom_k(*,'k'='%d') from %s where time > %d and time <= %d";
+    private final String countSql = "select count(*) from %s where time > %d and time <= %d slimit 1000";
+    private final String limitTopSql = "select * from %s where time > %d and time <= %d order by time limit %d slimit 1000";
+    private final String limitBottomSql = "select * from %s where time > %d and time <= %d order by time desc limit %d slimit 1000";
+//    private final String topSql = "select top_k(*,'k'='%d') from %s where time > %d and time <= %d";
+//    private final String bottomSql = "select bottom_k(*,'k'='%d') from %s where time > %d and time <= %d";
 
     public IoTDBSessionSummaryDataReader(Session session) throws Exception {
         this.session = session;
         session.open(false);
         session.setFetchSize(100);
-        session.setQueryTimeout(60000);
+        session.setQueryTimeout(600000);
         SessionDataSet versionSet = session.executeQueryStatement("show version");
         SessionDataSet.DataIterator vit = versionSet.iterator();
         vit.next();
@@ -106,12 +106,12 @@ public class IoTDBSessionSummaryDataReader implements SummaryDataReader {
     @Override
     public String readCount(String device, long endTimestamp) throws Exception {
 
-        return getResultString("count(*) " + device, session, "select count(*) from " + device + " where time<=" + endTimestamp);
+        return getResultString("count(*) " + device, session, "select count(*) from " + device + " where time<=" + endTimestamp + " slimit 1000");
     }
 
     @Override
     public String readMinMaxTime(String device, long endTimestamp) throws Exception {
-        return getResultString("minMaxTime(*) " + device, session, "select min_time(*),max_time(*) from " + device + " where time<=" + endTimestamp);
+        return getResultString("minMaxTime(*) " + device, session, "select min_time(*),max_time(*) from " + device + " where time<=" + endTimestamp + " slimit 1000");
     }
 
     @Override
@@ -129,15 +129,15 @@ public class IoTDBSessionSummaryDataReader implements SummaryDataReader {
         return getResultString(mark + beginTime + "->" + endTimestamp + "(*) " + device, session, String.format(limitBottomSql, device, beginTime, endTimestamp, count));
     }
 
-    @Override
-    public String readTop(String mark, String device, long beginTime, long endTimestamp, int count) throws Exception {
-        return getResultString(mark + beginTime + "->" + endTimestamp + "(*) " + device, session, String.format(topSql, count, device, beginTime, endTimestamp));
-    }
-
-    @Override
-    public String readBottom(String mark, String device, long beginTime, long endTimestamp, int count) throws Exception {
-        return getResultString(mark + beginTime + "->" + endTimestamp + "(*) " + device, session, String.format(bottomSql, count, device, beginTime, endTimestamp));
-    }
+//    @Override
+//    public String readTop(String mark, String device, long beginTime, long endTimestamp, int count) throws Exception {
+//        return getResultString(mark + beginTime + "->" + endTimestamp + "(*) " + device, session, String.format(topSql, count, device, beginTime, endTimestamp));
+//    }
+//
+//    @Override
+//    public String readBottom(String mark, String device, long beginTime, long endTimestamp, int count) throws Exception {
+//        return getResultString(mark + beginTime + "->" + endTimestamp + "(*) " + device, session, String.format(bottomSql, count, device, beginTime, endTimestamp));
+//    }
 
     @Override
     public void close() throws Exception {

@@ -124,15 +124,15 @@ public class LogSummaryDataReader implements SummaryDataReader, AutoCloseable {
         return readString();
     }
 
-    @Override
-    public String readTop(String mark, String device, long beginTime, long endTimestamp, int count) throws Exception {
-        return readString();
-    }
-
-    @Override
-    public String readBottom(String mark, String device, long beginTime, long endTimestamp, int count) throws Exception {
-        return readString();
-    }
+//    @Override
+//    public String readTop(String mark, String device, long beginTime, long endTimestamp, int count) throws Exception {
+//        return readString();
+//    }
+//
+//    @Override
+//    public String readBottom(String mark, String device, long beginTime, long endTimestamp, int count) throws Exception {
+//        return readString();
+//    }
 
     public String readString() throws Exception {
         String line;

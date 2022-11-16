@@ -108,17 +108,17 @@ public class UpgradeTestFrom2To3 {
                     }
                     final int limit = 100;
                     long curEndTime = endTimestamp;
-                    for (int k = 0; k < 30; k++) {
-                        long beginTime = curEndTime - DAY_AGO;
-                        readAndCompareData("d" ,reader, targetReader, j, device, limit, curEndTime, k, beginTime, saveDataIntegrity);
+//                    for (int k = 0; k < 30; k++) {
+                        long beginTime = curEndTime - DAY_AGO * 30;
+                        readAndCompareData("d" ,reader, targetReader, j, device, limit, curEndTime, 0, beginTime, saveDataIntegrity);
                         curEndTime = beginTime;
-                    }
+//                    }
                     // one year to the last month data,like count,top100,bottom100,minValue,maxValue
-                    for (int k = 0; k < 11; k++) {
-                        long beginTime = curEndTime - MONTH_AGO;
-                        readAndCompareData("m" ,reader, targetReader, j, device, limit, curEndTime, k, beginTime, saveDataIntegrity);
+//                    for (int k = 0; k < 11; k++) {
+                        beginTime = curEndTime - MONTH_AGO * 11;
+                        readAndCompareData("m" ,reader, targetReader, j, device, limit, curEndTime, 0, beginTime, saveDataIntegrity);
                         curEndTime = beginTime;
-                    }
+//                    }
                     // data from a year ago cout,like count,top100,bottom100,minValue,maxValue
                     readAndCompareData("y" ,reader, targetReader, j, device, limit, curEndTime, 0, -1, saveDataIntegrity);
                 }
@@ -156,22 +156,22 @@ public class UpgradeTestFrom2To3 {
         if(!Objects.equals(limitBottom.trim(), limitBottomTarget.trim())) {
             throw new Exception("device " + j + "-" + k + " limitBottom compare fail, "+limitBottom+" ≠" + limitBottomTarget);
         }
-        String top = reader.readTop("top" + markPre, device.left, beginTime, curEndTime, limit);
-        String topTarget = targetReader.readTop("top" + markPre, device.left, beginTime, curEndTime, limit);
-        if(!saveDataIntegrity) {
-            topTarget = SnapshootIoTDBSummary.encrypt2MD5(topTarget);
-        }
-        if(!Objects.equals(top.trim(), topTarget.trim())) {
-            throw new Exception("device " + j + "-" + k + " top compare fail, "+top+" ≠" + topTarget);
-        }
-        String bottom = reader.readBottom("bottom" + markPre, device.left, beginTime, curEndTime, limit);
-        String bottomTarget = targetReader.readBottom("bottom" + markPre, device.left, beginTime, curEndTime, limit);
-        if(!saveDataIntegrity) {
-            bottomTarget = SnapshootIoTDBSummary.encrypt2MD5(bottomTarget);
-        }
-        if(!Objects.equals(bottom.trim(), bottomTarget.trim())) {
-            throw new Exception("device " + j + "-" + k + " bottom compare fail, "+bottom+" ≠" + bottomTarget);
-        }
+//        String top = reader.readTop("top" + markPre, device.left, beginTime, curEndTime, limit);
+//        String topTarget = targetReader.readTop("top" + markPre, device.left, beginTime, curEndTime, limit);
+//        if(!saveDataIntegrity) {
+//            topTarget = SnapshootIoTDBSummary.encrypt2MD5(topTarget);
+//        }
+//        if(!Objects.equals(top.trim(), topTarget.trim())) {
+//            throw new Exception("device " + j + "-" + k + " top compare fail, "+top+" ≠" + topTarget);
+//        }
+//        String bottom = reader.readBottom("bottom" + markPre, device.left, beginTime, curEndTime, limit);
+//        String bottomTarget = targetReader.readBottom("bottom" + markPre, device.left, beginTime, curEndTime, limit);
+//        if(!saveDataIntegrity) {
+//            bottomTarget = SnapshootIoTDBSummary.encrypt2MD5(bottomTarget);
+//        }
+//        if(!Objects.equals(bottom.trim(), bottomTarget.trim())) {
+//            throw new Exception("device " + j + "-" + k + " bottom compare fail, "+bottom+" ≠" + bottomTarget);
+//        }
     }
 
     public static IoTDBSessionSummaryDataReader getSummaryDataReader(String source) throws Exception {
